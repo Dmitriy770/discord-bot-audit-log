@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	token        *string
-	logChannelId *string
+	token        string
+	logChannelId string
 )
 
 var (
@@ -21,8 +21,8 @@ var (
 )
 
 func init() {
-	token = flag.String("token", "", "discord bot token")
-	logChannelId = flag.String("log-channel-id", "", "channel id for logs")
+	token = os.Getenv("TOKEN")
+	logChannelId = os.Getenv("LOG_CHANNEL_ID")
 	flag.Parse()
 
 	ErrorLogger = log.New(os.Stderr, "Error: ", log.Ldate|log.Ltime|log.Lshortfile)
@@ -30,14 +30,14 @@ func init() {
 }
 
 func main() {
-	session, err := discordgo.New("Bot " + *token)
+	session, err := discordgo.New("Bot " + token)
 	if err != nil {
 		ErrorLogger.Print(err)
 		return
 	}
 	session.Identify.Intents = discordgo.IntentGuildVoiceStates | discordgo.IntentGuildMessages
 
-	handlers.LogChannelID = *logChannelId
+	handlers.LogChannelID = logChannelId
 	session.AddHandler(handlers.VoiceStateUpdate)
 
 	err = session.Open()

@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  discod-bot-audit-log:
+    build:
+      context: ..
+      dockerfile: build/package/Dockerfile
+    environment:
+      - TOKEN=
+      - LOG_CHANNEL_ID=
