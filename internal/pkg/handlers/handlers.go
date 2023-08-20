@@ -80,5 +80,28 @@ func VoiceStateUpdate(session *discordgo.Session, event *discordgo.VoiceStateUpd
 		embed.Color = moveColor
 
 		session.ChannelMessageSendEmbed(LogChannelID, embed)
+	} else if !oldVoiceState.Deaf && event.Deaf {
+		fmt.Println("Пользователю отключили звук и микрофон")
+
+	} else if oldVoiceState.Deaf && !event.Deaf {
+		fmt.Println("Пользователю включили звук и микрофон")
+
+	} else if !oldVoiceState.Mute && event.Mute {
+		fmt.Println("Пользователю отключили микрофон")
+
+	} else if oldVoiceState.Mute && !event.Mute {
+		fmt.Println("Пользователю включили микрофон")
+
+	} else if !oldVoiceState.SelfDeaf && event.SelfDeaf {
+		fmt.Println("Пользователь отключил звук и микрофон")
+
+	} else if oldVoiceState.SelfDeaf && !event.SelfDeaf {
+		fmt.Println("Пользователь включил звук и микрофон")
+
+	} else if !oldVoiceState.SelfMute && event.SelfMute {
+		fmt.Println("Пользователь отключил микрофон")
+
+	} else if oldVoiceState.Deaf && !event.Deaf {
+		fmt.Println("Пользователь отключил звук")
 	}
 }
