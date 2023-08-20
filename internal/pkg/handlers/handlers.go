@@ -10,9 +10,17 @@ import (
 )
 
 const (
-	joinColor = 0x08ff08
-	leftColor = 0xff0800
-	moveColor = 0xff8000
+	joinColor       = 0x00b300
+	leftColor       = 0xff0800
+	moveColor       = 0xff9900
+	selfMuteColor   = 0x8a0041
+	selfUnmuteColor = 0xea69a6
+	selfDeafColor   = 0x8a0041
+	selfUndeafColor = 0xea69a6
+	muteColor       = 0x42036f
+	unmuteColor     = 0xa767d5
+	deafColor       = 0x42036f
+	undeafColor     = 0xa767d5
 )
 
 var LogChannelID string
@@ -26,7 +34,7 @@ func VoiceStateUpdate(session *discordgo.Session, event *discordgo.VoiceStateUpd
 	avatar := event.Member.User.AvatarURL("")
 	embed := &discordgo.MessageEmbed{
 		Author: &discordgo.MessageEmbedAuthor{
-			Name:    event.Member.User.Username,
+			Name:    event.Member.User.Username + " : ",
 			IconURL: avatar,
 		},
 		Timestamp: time.Now().Format(time.RFC3339),
@@ -44,6 +52,7 @@ func VoiceStateUpdate(session *discordgo.Session, event *discordgo.VoiceStateUpd
 		}
 		embed.Fields = append(embed.Fields, channelField)
 		embed.Color = joinColor
+		embed.Author.Name += "JOIN"
 
 		session.ChannelMessageSendEmbed(LogChannelID, embed)
 	} else if event.ChannelID == "" {
@@ -58,6 +67,7 @@ func VoiceStateUpdate(session *discordgo.Session, event *discordgo.VoiceStateUpd
 		}
 		embed.Fields = append(embed.Fields, channelField)
 		embed.Color = leftColor
+		embed.Author.Name += "LEFT"
 
 		session.ChannelMessageSendEmbed(LogChannelID, embed)
 	} else if oldVoiceState.ChannelID != event.ChannelID {
@@ -78,30 +88,80 @@ func VoiceStateUpdate(session *discordgo.Session, event *discordgo.VoiceStateUpd
 		}
 		embed.Fields = append(embed.Fields, channelField)
 		embed.Color = moveColor
+		embed.Author.Name += "MOVE"
 
 		session.ChannelMessageSendEmbed(LogChannelID, embed)
 	} else if !oldVoiceState.Deaf && event.Deaf {
-		fmt.Println("Пользователю отключили звук и микрофон")
+		infoField := &discordgo.MessageEmbedField{
+			Value: fmt.Sprintf("пользователю отключили звук"),
+		}
+		embed.Fields = append(embed.Fields, infoField)
+		embed.Author.Name += "DEAF"
+		embed.Color = deafColor
 
+		session.ChannelMessageSendEmbed(LogChannelID, embed)
 	} else if oldVoiceState.Deaf && !event.Deaf {
-		fmt.Println("Пользователю включили звук и микрофон")
+		infoField := &discordgo.MessageEmbedField{
+			Value: fmt.Sprintf("пользователю включили звук"),
+		}
+		embed.Fields = append(embed.Fields, infoField)
+		embed.Author.Name += "UNDEAF"
+		embed.Color = undeafColor
 
+		session.ChannelMessageSendEmbed(LogChannelID, embed)
 	} else if !oldVoiceState.Mute && event.Mute {
-		fmt.Println("Пользователю отключили микрофон")
+		infoField := &discordgo.MessageEmbedField{
+			Value: fmt.Sprintf("пользователю отключили микрофон"),
+		}
+		embed.Fields = append(embed.Fields, infoField)
+		embed.Author.Name += "MUTE"
+		embed.Color = muteColor
 
+		session.ChannelMessageSendEmbed(LogChannelID, embed)
 	} else if oldVoiceState.Mute && !event.Mute {
-		fmt.Println("Пользователю включили микрофон")
+		infoField := &discordgo.MessageEmbedField{
+			Value: fmt.Sprintf("пользователю включили микрофон"),
+		}
+		embed.Fields = append(embed.Fields, infoField)
+		embed.Author.Name += "UNMUTE"
+		embed.Color = unmuteColor
 
+		session.ChannelMessageSendEmbed(LogChannelID, embed)
 	} else if !oldVoiceState.SelfDeaf && event.SelfDeaf {
-		fmt.Println("Пользователь отключил звук и микрофон")
+		infoField := &discordgo.MessageEmbedField{
+			Value: fmt.Sprintf("отключил звук"),
+		}
+		embed.Fields = append(embed.Fields, infoField)
+		embed.Author.Name += "SELF DEAF"
+		embed.Color = selfDeafColor
 
+		session.ChannelMessageSendEmbed(LogChannelID, embed)
 	} else if oldVoiceState.SelfDeaf && !event.SelfDeaf {
-		fmt.Println("Пользователь включил звук и микрофон")
+		infoField := &discordgo.MessageEmbedField{
+			Value: fmt.Sprintf("включил звук"),
+		}
+		embed.Fields = append(embed.Fields, infoField)
+		embed.Author.Name += "SELF UNDEAF"
+		embed.Color = selfUndeafColor
 
+		session.ChannelMessageSendEmbed(LogChannelID, embed)
 	} else if !oldVoiceState.SelfMute && event.SelfMute {
-		fmt.Println("Пользователь отключил микрофон")
+		infoField := &discordgo.MessageEmbedField{
+			Value: fmt.Sprintf("отключил микрофон"),
+		}
+		embed.Fields = append(embed.Fields, infoField)
+		embed.Author.Name += "SELF MUTE"
+		embed.Color = selfMuteColor
 
-	} else if oldVoiceState.Deaf && !event.Deaf {
-		fmt.Println("Пользователь отключил звук")
+		session.ChannelMessageSendEmbed(LogChannelID, embed)
+	} else if oldVoiceState.SelfMute && !event.SelfMute {
+		infoField := &discordgo.MessageEmbedField{
+			Value: fmt.Sprintf("включил микрофон"),
+		}
+		embed.Fields = append(embed.Fields, infoField)
+		embed.Author.Name += "SELF UNMUTE"
+		embed.Color = selfUnmuteColor
+
+		session.ChannelMessageSendEmbed(LogChannelID, embed)
 	}
 }
